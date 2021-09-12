@@ -58,7 +58,7 @@ class App extends Component {
             <Grid columns={2} stretched textAlign='center' doubling>
                 <Grid.Row verticalAlign='middle'>
                     <Grid.Column>
-                        <video ref="video" width="640" height="360" controls playsInline={true} />
+                        <video ref="video" controls playsInline={true} />
                     </Grid.Column>
 
                     <Grid.Column>
