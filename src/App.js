@@ -1,22 +1,27 @@
 import React, { Component } from 'react';
-import {Segment, Grid, Table, Container, Menu, Select, Label} from 'semantic-ui-react';
+import {Segment, Grid, Table, Container, Menu, Input, Button} from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
-import {getData, REST_URL, WEB_URL} from "./tools";
+import {getData, putData, REST_URL, WEB_URL} from "./tools";
 
 class App extends Component {
 
   state = {
-      dir_options: [],
+      dir_options: [{key: 1, text: "Data", value: "data"}],
       files: [],
       current_file: null,
-      current_dir: null,
+      current_dir: "data",
+      uid: "",
+      inp: "",
+      oup: "",
+      trimming: false
   };
 
     componentDidMount() {
-        getData(`${WEB_URL}/options.json`, dir_options => {
-            this.setState({dir_options})
-        })
+        // getData(`${WEB_URL}/options.json`, dir_options => {
+        //     this.setState({dir_options})
+        // })
+        this.getFiles("data");
     };
 
     getFiles = (dir) => {
@@ -29,7 +34,7 @@ class App extends Component {
         const {current_dir} = this.state;
         this.setState({current_file});
         let video = this.refs.video;
-        video.src = `${REST_URL}/data/video/${current_dir}/` + current_file;
+        video.src = `${REST_URL}/${current_dir}/` + current_file;
         video.play()
     };
 
@@ -38,8 +43,20 @@ class App extends Component {
         this.getFiles(current_dir);
     }
 
+    startTrim = () => {
+        this.setState({trimming: true, uid: "", inp: "", oup: ""});
+        const {uid, inp, oup} = this.state;
+        getData(`${REST_URL}/trim?uid=${uid}&sstart=${inp}&send=${oup}`, (cb) => {
+            console.log(":: startTrim respond: ", cb);
+            this.setState({trimming: false});
+            this.getFiles("data")
+        });
+    }
+
   render() {
-      const {files, current_file, dir_options} = this.state;
+      const {files, current_file, uid, inp, oup, trimming} = this.state;
+
+      const action = uid === "" || inp === "" || oup === ""
 
       let files_list = files.map((file,i) => {
           return (
@@ -64,13 +81,24 @@ class App extends Component {
                     <Grid.Column>
                         <Menu secondary>
                             <Menu.Item>
-                                <Label size='big'>{current_file}</Label>
+                                <Input type='text' placeholder='File UID' value={uid}
+                                       onChange={(e, { value }) => this.setState({uid: value})}>
+                                </Input>
+                            </Menu.Item>
+                            <Menu.Item>
+                                <Input type='text' placeholder='In Point' value={inp}
+                                       onChange={(e, { value }) => this.setState({inp: value})}>
+                                </Input>
+                            </Menu.Item>
+                            <Menu.Item>
+                                <Input type='text' placeholder='Out Point' value={oup}
+                                       onChange={(e, { value }) => this.setState({oup: value})}>
+                                </Input>
                             </Menu.Item>
                             <Menu.Menu position='right'>
                                 <Menu.Item>
-                                    <Select options={dir_options}
-                                            placeholder='Dir options'
-                                            onChange={(e, {value}) => this.selectDir(value)} />
+                                    <Button type='submit' color='blue' disabled={action} loading={trimming}
+                                            onClick={() => this.startTrim()}>GO</Button>
                                 </Menu.Item>
                             </Menu.Menu>
                         </Menu>
