@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import {Segment, Grid, Table, Container, Menu, Select, Label} from 'semantic-ui-react';
+import {Segment, Grid, Table, Checkbox, Menu, Select, Label} from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
-import {getData, REST_URL, WEB_URL} from "./tools";
+import {getData, REST_URL} from "./tools";
 
 class App extends Component {
 
@@ -11,10 +11,13 @@ class App extends Component {
       files: [],
       current_file: null,
       current_dir: null,
+      i: 0,
+      loop: false,
+
   };
 
     componentDidMount() {
-        getData(`${WEB_URL}/options.json`, dir_options => {
+        getData(`options.json`, dir_options => {
             this.setState({dir_options})
         })
     };
@@ -25,12 +28,19 @@ class App extends Component {
         })
     }
 
-    selectFiles = (current_file) => {
-        const {current_dir} = this.state;
-        this.setState({current_file});
+    selectFiles = (current_file, i) => {
+        const {current_dir, loop} = this.state;
+        this.setState({current_file, i});
         let video = this.refs.video;
         video.src = `${REST_URL}/data/video/${current_dir}/` + current_file;
-        video.play()
+        video.play();
+        if(loop) {
+            video.onended = () => {
+                let {files, i} = this.state;
+                let c = i === files.length-1 ? 0 : i+1;
+                this.selectFiles(files[c], c)
+            }
+        }
     };
 
     selectDir = (current_dir) => {
@@ -39,7 +49,7 @@ class App extends Component {
     }
 
   render() {
-      const {files, current_file, dir_options} = this.state;
+      let {files, current_file, dir_options, loop} = this.state;
 
       let files_list = files.map((file,i) => {
           return (
@@ -52,29 +62,27 @@ class App extends Component {
       });
 
     return (
-        <Container fluid>
-            <br />
-        <Segment placeholder>
+
+        <Segment basic attached>
+            <Label size='big' attached>{current_file?.split('.')[0]}</Label>
             <Grid columns={2} stretched textAlign='center' doubling>
                 <Grid.Row verticalAlign='middle'>
                     <Grid.Column>
                         <video ref="video" controls playsInline={true} />
                     </Grid.Column>
-
                     <Grid.Column>
                         <Menu secondary>
                             <Menu.Item>
-                                <Label size='big'>{current_file}</Label>
+                                <Select options={dir_options}
+                                        placeholder='Dir options'
+                                        onChange={(e, {value}) => this.selectDir(value)} />
                             </Menu.Item>
-                            <Menu.Menu position='right'>
-                                <Menu.Item>
-                                    <Select options={dir_options}
-                                            placeholder='Dir options'
-                                            onChange={(e, {value}) => this.selectDir(value)} />
-                                </Menu.Item>
-                            </Menu.Menu>
+                            <Menu.Item>
+                                <Checkbox label='Auto Play' onChange={() => this.setState({loop: !loop})}
+                                          checked={loop} />
+                            </Menu.Item>
                         </Menu>
-                        <Segment textAlign='center' className="group_list" raised>
+                        <Segment textAlign='center' className="group_list" >
                             <Table selectable compact='very' basic structured className="admin_table" unstackable>
                                 <Table.Body>
                                     {files_list}
@@ -85,7 +93,7 @@ class App extends Component {
                 </Grid.Row>
             </Grid>
         </Segment>
-        </Container>
+
     );
   }
 }
