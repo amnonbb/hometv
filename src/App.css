@@ -6,8 +6,11 @@
   max-height: 350px;
 }
 
-.admin_table {
-  cursor: pointer!important;
+.active-row .rs-table-cell {
+  font-weight: bold!important;
+  text-decoration: underline;
+  text-decoration-color: red;
+  /*text-decoration-style: double;*/
 }
 
 .admin_table .ui.table tr.warning, .ui.table td.warning {

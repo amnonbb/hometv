@@ -14,15 +14,14 @@
   "dependencies": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^2.0.4"
+    "rsuite": "^5.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.11.0",
-    "@babel/runtime": "^7.16.5",
     "@babel/plugin-transform-runtime": "^7.16.5",
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-react": "^7.10.4",
+    "@babel/runtime": "^7.16.5",
     "babel-loader": "^8.1.0",
     "css-loader": "^4.2.0",
     "dotenv": "^10.0.0",
