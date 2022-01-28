@@ -73,7 +73,9 @@ class App extends Component {
             <Content>
                 <FlexboxGrid justify="space-around" align="middle">
                     <FlexboxGrid.Item as={Col} colspan={20} md={12}>
-                        <video ref="video" width={640} height={360} controls playsInline={true} />
+                        <Panel bordered>
+                            <video ref="video" width={640} height={360} controls playsInline={true} />
+                        </Panel>
                     </FlexboxGrid.Item>
                     <FlexboxGrid.Item as={Col} colspan={20} md={12}>
                         <Table virtualized height={400} headerHeight={100} hover data={files} bordered
